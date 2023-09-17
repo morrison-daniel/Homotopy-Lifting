@@ -38,24 +38,18 @@ Theorems:
 `isCompact_prod` : product of compact sets is compact
 -/
 
-variable {X E : Type _}
-variable [TopologicalSpace X] [TopologicalSpace E]
-variable {p : C(E, X)}
-variable {Y : Type _} [TopologicalSpace Y]
-variable {hp : IsCoveringMap p} (φ : LiftingSetup Y hp)
+variable {X E : Type _} [TopologicalSpace X] [TopologicalSpace E]
+variable {p : C(E, X)} {hp : IsCoveringMap p}
 
-structure LiftingSetup (Y : Type _) [TopologicalSpace Y] (hp : IsCoveringMap p) where
+structure LiftSetup (p : C(E, X)) (Y : Type _) [TopologicalSpace Y] where
   f : C(Y × I, X)
   F₀ : C(Y, E)
-  f_eq_pF₀ : ∀ y : Y, f (y, 0) = (p ∘ F₀) y
+  f_eq_pF₀ : ∀ y : Y, f (y, 0) = p (F₀ y)
 
-structure TrivializedNbhd (y : Y) (t : I) where
-  triv : Trivialization (p ⁻¹' {φ.f (y, t)}) p
-  -- U is a nbhd of (y, t) which maps to triv.baseSet
-  U : Set (Y × I)
-  hU : U ∈ 𝓝 (y, t)
+variable {Y : Type _} [TopologicalSpace Y]
+variable (φ : LiftSetup p Y)
 
-lemma nbhd_in_trivialization (y : Y) (t : I) :
+lemma trivial_nbhd (y : Y) (t : I) :
   ∃ triv : Trivialization (p ⁻¹' {φ.f (y, t)}) p, φ.f ⁻¹' triv.baseSet ∈ 𝓝 (y, t) := by
     specialize hp <| φ.f (y, t)
     let triv : Trivialization (p ⁻¹' {φ.f (y, t)}) p := by
@@ -70,10 +64,11 @@ lemma nbhd_in_trivialization (y : Y) (t : I) :
       . rw [preimage]
         exact IsEvenlyCovered.mem_toTrivialization_baseSet hp
 
-noncomputable def triv_nbhd (y : Y) (t : I) : TrivializedNbhd φ y t where
-  triv := (nbhd_in_trivialization φ y t).choose
-  U := φ.f ⁻¹' (nbhd_in_trivialization φ y t).choose.baseSet
-  hU := (nbhd_in_trivialization φ y t).choose_spec
+#check nhds_prod_eq
+
+lemma trivial_tube (y : Y) : 
+  ∃ U ∈ 𝓝 (y), ∀ t : I, ∃ V ∈ 𝓝 (t), ∃ triv : Trivialization (p ⁻¹' {φ.f (y, t)}) p, U ×ˢ V ⊆ φ.f ⁻¹' triv.baseSet := by
+    sorry
 
 theorem existence_of_homotopy_lift : ∃ F : C(Y × I, E), p ∘ F = f ∧ (fun y ↦ F (y, 0)) = F₀ := by
   sorry
